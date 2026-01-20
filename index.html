@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideUCM</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+ 
+    <h1>RideUCM</h1>
+    <div id="book-ride-form">
+        
+        <form id="ride-booking-form">
+            <h2>Book a Ride to University</h2>
+            <label for="name">Name:</label><br>
+            <input type="text" id="name" name="name" required><br>
+            <label for="pickup-location">Pickup Location:</label><br>
+            <input type="text" id="pickup-location" name="pickup-location" required><br>
+            <label for="destination">Destination:</label><br>
+            <input type="text" id="destination" name="destination" required><br>
+            <label for="date">Date:</label><br>
+            <input type="date" id="date" name="date" min="2023-04-01" max="2030-04-30" required><br>
+            <label for="time">Time:</label><br>
+            <input type="time" id="time" name="time" min="00:00" max="23:59" required><br>
+            <input type="submit" value="Book Ride">
+        </form>
+        
+        <div id="confirmation-box" style="display: none;">
+            <h2>Ride Confirmation</h2>
+            <p>Dear <span id="user-name"></span>,</p>
+            <p>Your ride has been successfully booked!</p>
+            <p>Confirmation Number: <span id="confirmation-number"></span></p>
+            <ul>
+                <li><strong>Pickup Location:</strong> <span id="pickup-location-confirmation"></span></li>
+                <li><strong>Destination:</strong> <span id="destination-confirmation"></span></li>
+                <li><strong>Date:</strong> <span id="date-confirmation"></span></li>
+                <li><strong>Time:</strong> <span id="time-confirmation"></span></li>
+            </ul>
+            <p>Please ensure that you are ready at the specified pickup location at the designated time.</p>
+            <p>Thank you for choosing RideUCM!</p>
+            <p>Best regards,</p>
+            <p>The RideUCM Team</p>
+        </div>
+        
+    </div>
+    
+    <script>
+        // Generate a 6-digit all-caps confirmation number
+        const confirmationNumber = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        // Get the form and confirmation message elements
+const form = document.getElementById("ride-booking-form");
+const confirmationBox = document.getElementById("confirmation-box");
+const userName = document.getElementById("user-name");
+const pickupLocationConfirmation = document.getElementById("pickup-location-confirmation");
+const destinationConfirmation = document.getElementById("destination-confirmation");
+const dateConfirmation = document.getElementById("date-confirmation");
+const timeConfirmation = document.getElementById("time-confirmation");
+const confirmationNumberElement = document.getElementById("confirmation-number");
+
+// Add an event listener to the form submission
+form.addEventListener("submit", (event) => {
+    // Prevent the form from submitting normally
+    event.preventDefault();
+
+    // Get the form data
+    const formData = new FormData(form);
+    const name = formData.get("name");
+    const pickupLocation = formData.get("pickup-location");
+    const destination = formData.get("destination");
+    const date = formData.get("date");
+    const time = formData.get("time");
+
+    // Convert the time to a 12-hour format with AM/PM
+    const time12Hour = new Date(`1970-01-01T${time}Z`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    // Set the confirmation message values
+    userName.textContent = name;
+    pickupLocationConfirmation.textContent = pickupLocation;
+    destinationConfirmation.textContent = destination;
+    dateConfirmation.textContent = date;
+    timeConfirmation.textContent = time12Hour;
+    confirmationNumberElement.textContent = confirmationNumber;
+
+    // Show the confirmation message
+    confirmationBox.style.display = "block";
+
+    // Hide the form
+    form.style.display = "none";
+});
+
+// Function to generate the text file content
+function generateTextFileContent() {
+    const content = `Confirmation Number: ${confirmationNumber}
+Name: ${userName.textContent}
+Pickup Location: ${pickupLocationConfirmation.textContent}
+Destination: ${destinationConfirmation.textContent}
+Date: ${dateConfirmation.textContent}
+Time: ${timeConfirmation.textContent}`;
+
+    return content;
+}
+
+// Function to download the text file
+function downloadTextFile(filename, content) {
+    const element = document.createElement("a");
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(content));
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+// Add a download button to the HTML and attach the download function to it
+const downloadButton = document.createElement("button");
+downloadButton.textContent = "Download Confirmation";
+downloadButton.addEventListener("click", () => {
+    downloadTextFile("ride_confirmation.txt", generateTextFileContent());
+});
+confirmationBox.appendChild(downloadButton);
+    </script>
+    
+</body>
+</html>
